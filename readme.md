@@ -1,1 +1,1 @@
-[https://github.com/Taggagii/midpointShapes/blob/master/addingpoints.mp4](https://github.com/Taggagii/midpointShapes/blob/master/addingpoints.mp4)
+[![Video](https://github.com/Taggagii/midpointShapes/blob/master/equationsolver.png)](https://github.com/Taggagii/midpointShapes/blob/master/addingpoints.mp4)
