@@ -1,8 +1,8 @@
 const canvas = document.querySelector("canvas#drawing");
 const context = canvas.getContext('2d')
 
-canvas.width = window.innerHeight;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth * devicePixelRatio;
+canvas.height = window.innerHeight * devicePixelRatio - 200;
 
 const midpoint = (point1, point2) => {
     return new Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2, (point1.xvel + point2.xvel) / 2, (point1.yvel + point2.yvel) / 2, point1.boundsExpansion);
@@ -10,7 +10,6 @@ const midpoint = (point1, point2) => {
 
 const drawLine = (point1, point2) => {
     context.beginPath()
-    context.lineWidth = 3
     context.moveTo(...point1.values());
     context.lineTo(...point2.values())
     context.stroke()
@@ -24,11 +23,11 @@ const drawBall = (point) => {
     context.fill()
 }
 
-
 const drawPolygon = (points, depth = 1, cleanupFactor = 0) => {
-    if (cleanupFactor > depth) {
-        throw new Error('cleanupfactor cannot be larger than depth')
-    }
+    // if (cleanupFactor > depth) {
+    //     console.log(cleanupFactor, depth)
+    //     throw new Error('cleanupfactor cannot be larger than depth')
+    // }
     for (let i = 0; i < cleanupFactor; ++i) {
         let newpoints = []
         for (let ii = 0; ii < points.length; ++ii) {
@@ -122,17 +121,91 @@ const probabilisticTrue = (probability) => {
 }
 
 
-let numberOfPoints = 200
+let numberOfPoints = 100
 let points = []
 let maxVel = 25;
-let boundsExpansion = canvas.width / 4;
+let boundsExpansion = 0;
+let value = 800;
+let layersToHide = 20;
+
+
+const pointCountSlider = document.getElementById('pointCount');
+const layersToHideSlider = document.getElementById('layersToHide');
+const layersSlider = document.getElementById('layers');
+const maxVelocitySlider = document.getElementById('maxVelocity');
+// const collisionBoundsSlider = document.getElementById('collisionBounds');
+const regenerateButton = document.getElementById('reset');
+
+// context.lineWidth = 1;
+
+numberOfPoints = pointCountSlider.value;
+maxVel = maxVelocitySlider.value;
+// boundsExpansion = parseInt(collisionBoundsSlider.value);
+value = layersSlider.value;
+layersToHide = layersToHideSlider.value;
+
+
+
+layersToHideSlider.max = layersSlider.value - 1;
+
+layersToHideSlider.addEventListener('input', (event) => {
+    layersToHide = layersToHideSlider.value;
+});
+
+layersSlider.addEventListener('input', (event) => {
+    if (layersSlider.value - 1 < layersToHideSlider.value) {
+        layersToHide = layersSlider.value - 1;
+        layersToHideSlider.value = layersSlider.value - 1;
+    }
+    value = layersSlider.value;
+    layersToHideSlider.max = layersSlider.value - 1;
+});
+
+pointCountSlider.addEventListener('input', (event) => {
+    let desiredLength = pointCountSlider.value;
+    let difference = desiredLength - numberOfPoints;
+    
+    if (difference > 0) { // if postive then we need to add points
+        for (let i = 0; i < difference; ++i) {
+            points.push(new Point(myRandomValue(canvas.width), myRandomValue(canvas.height), myRandomValue(maxVel, false), myRandomValue(maxVel, false),
+                   boundsExpansion))
+        }
+    } else if (difference < 0) { // if negative then we need to remove points
+        for (let i = 0; i < Math.abs(difference); ++i) {
+            points.pop();
+        }
+    }
+
+    numberOfPoints = pointCountSlider.value;
+    
+});
+
+maxVelocitySlider.addEventListener('input', (event) => {
+    const ratio = maxVelocitySlider.value / maxVel;
+    maxVel = maxVelocitySlider.value;
+
+    points.forEach((point) => {
+        point.xvel *= ratio;
+        point.yvel *= ratio;
+    });
+});
+
+regenerateButton.addEventListener('click', (event) => {
+    points = [];
+    for (let i = 0; i < numberOfPoints; ++i) {
+        points.push(new Point(myRandomValue(canvas.width), myRandomValue(canvas.height), myRandomValue(maxVel, false), myRandomValue(maxVel, false),
+                   boundsExpansion))
+    }
+});
+
+
+// let boundsExpansion = canvas.width / 4;
 for (let i = 0; i < numberOfPoints; ++i) {
     points.push(new Point(myRandomValue(canvas.width), myRandomValue(canvas.height), myRandomValue(maxVel, false), myRandomValue(maxVel, false),
                boundsExpansion))
 }
 
-let value = 1000;
-let hideAll = 0;
+
 const loop = async () => {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -140,7 +213,7 @@ const loop = async () => {
         point.update();
     });
 
-    drawPolygon(points, value, value - 20)
+    drawPolygon(points, value, layersToHide)
 
     setTimeout(() => {
         loop()

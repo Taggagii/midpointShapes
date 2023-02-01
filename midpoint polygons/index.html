@@ -6,8 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>what</title>
 </head>
-<body>
-    <canvas id="drawing" style="border: 1px solid black;"></canvas>
+<body style="padding: 0; margin: 0; overflow: hidden;">
+    <div style="padding: 10px">
+        <div style="user-select: none;">Point Count:</div>
+        <input  type="range" min="1" max="1000" value="171" id="pointCount" style="width: 100%" ><br>
+        <div style="user-select: none;">Layers:</div>
+        <input  type="range" min="1" max="2000" value="73" id="layers" style="width: 100%" ><br>
+        <div style="user-select: none;">Layers To Hide</div>
+        <input  type="range" min="0" max="100" value="0" id="layersToHide" style="width: 100%" ><br>
+        <div style="user-select: none;">Max Velocity</div>
+        <input  type="range" min="1" max="100" value="7" id="maxVelocity" style="width: 100%" ><br>
+        <!-- Collision Bounds:
+        <input  type="range" min="-1000" max="1000" value="0" id="collisionBounds" style="width: 50%" ><br> -->
+        <input type="button" id="reset" value = "Regenerate">
+    </div>
+    <canvas id="drawing" style="margin: 0; padding: 0; border: 1px solid black;"></canvas>
 </body>
 </html>
 <script src="main.js"></script>
